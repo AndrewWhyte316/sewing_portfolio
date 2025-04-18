@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sewing Portfolio</title>
+    <link rel="stylesheet" href="https://cdn.simplecss.org/simple.css">
+</head>
+<body>
+    <header>
+        <h1>Sewing Portfolio</h1>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/maorial">Maorial</a>
+            <a href="/weddings">Weddings</a>
+            <a href="/general_alterations">General Alterations</a>
+            <a href="/custom_jobs">Custom Jobs</a>
+            <a href="/curtains">Curtains</a>
+            {% if session.get("logged_in") %}
+                <a href="/upload">Upload</a>
+                <a href="/logout">Logout</a>
+            {% else %}
+                <a href="/login">Login</a>
+            {% endif %}
+        </nav>
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>
