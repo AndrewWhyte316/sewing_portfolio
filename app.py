@@ -70,7 +70,59 @@ def upload():
         flash("Invalid file.")
     return render_template("upload.html", categories=categories)
 
-# ✅ FIXED: Dynamic category routes using unique view functions and endpoints
+@app.route("/delete/<category>/<filename>", methods=["POST"])
+def delete_file(category, filename):
+    if not session.get("logged_in"):
+        flash("You must be logged in to delete images.")
+        return redirect(url_for("login"))
+
+    folder = os.path.join(app.config["UPLOAD_FOLDER"], category)
+    file_path = os.path.join(folder, filename)
+    desc_file = os.path.join(folder, "descriptions.json")
+
+    # Delete image
+    if os.path.exists(file_path):
+        os.remove(file_path)
+
+    # Remove description
+    if os.path.exists(desc_file):
+        with open(desc_file, "r") as f:
+            descriptions = json.load(f)
+        descriptions.pop(filename, None)
+        with open(desc_file, "w") as f:
+            json.dump(descriptions, f)
+
+    flash("Image deleted.")
+    return redirect(url_for(category))
+
+
+@app.route("/edit/<category>/<filename>", methods=["GET", "POST"])
+def edit_description(category, filename):
+    if not session.get("logged_in"):
+        flash("You must be logged in to edit descriptions.")
+        return redirect(url_for("login"))
+
+    folder = os.path.join(app.config["UPLOAD_FOLDER"], category)
+    desc_file = os.path.join(folder, "descriptions.json")
+
+    descriptions = {}
+    if os.path.exists(desc_file):
+        with open(desc_file, "r") as f:
+            descriptions = json.load(f)
+
+    if request.method == "POST":
+        new_desc = request.form["description"]
+        descriptions[filename] = new_desc
+        with open(desc_file, "w") as f:
+            json.dump(descriptions, f)
+        flash("Description updated.")
+        return redirect(url_for(category))
+
+    current_desc = descriptions.get(filename, "")
+    return render_template("edit.html", category=category, filename=filename, description=current_desc)
+
+
+# Dynamic category routes using unique view functions and 
 def generate_category_view(category_name):
     def view():
         folder = os.path.join(app.config["UPLOAD_FOLDER"], category_name)
@@ -86,7 +138,7 @@ def generate_category_view(category_name):
         return render_template(f"{category_name}.html", images=images, descriptions=descriptions)
     return view
 
-# ✅ Register all routes with unique function names via endpoints
+# Register all routes with unique function names via endpoints
 for category_name in categories:
     view_func = generate_category_view(category_name)
     app.add_url_rule(f"/{category_name}", endpoint=category_name, view_func=view_func)
