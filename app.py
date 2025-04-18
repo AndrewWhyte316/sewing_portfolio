@@ -10,11 +10,11 @@ app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "defaultsecret")
 UPLOAD_FOLDER = "static/uploads"
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
-USERNAME = os.getenv("USERNAME", "admin")
-PASSWORD = os.getenv("PASSWORD", "sewsecure123")
+USERNAME = os.getenv("USERNAME")
+PASSWORD = os.getenv("PASSWORD")
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
-categories = ["maorial", "weddings", "general_alterations", "custom_jobs", "curtains"]
+categories = ["memorial", "weddings", "general_alterations", "custom_jobs", "curtains"]
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -144,4 +144,5 @@ for category_name in categories:
     app.add_url_rule(f"/{category_name}", endpoint=category_name, view_func=view_func)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=True)
+

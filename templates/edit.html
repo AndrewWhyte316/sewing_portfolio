@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Edit Description</h2>
+
+<p>Editing: <strong>{{ filename }}</strong></p>
+
+<form method="post">
+    <textarea name="description" rows="4" style="width: 100%;">{{ description }}</textarea><br><br>
+    <button type="submit">Save</button>
+</form>
+
+<br>
+<a href="{{ url_for(category) }}">← Back to {{ category.replace('_', ' ').title() }}</a>
+{% endblock %}
